@@ -1,0 +1,15 @@
+{
+  "name": "url-shortener",
+  "version": "1.0.0",
+  "description": "Node.js and Express.js api to short urls",
+  "main": "server.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Pierre Thiollent",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1"
+  }
+}
