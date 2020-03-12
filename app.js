@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const dns = require('dns');
 const mongoose = require('mongoose');
-const Site = require('./models/Site');
+const sitesRoutes = require('./routes/sites');
 
 const app = express();
 let id = 0;
@@ -27,38 +27,6 @@ app.get('/', (req, res) => {
 // Converti le body de la requete
 app.use(express.urlencoded({ extended: false }));
 
-// Route pour récupérer une url courte
-app.post('/api/shorturl/new', (req, res) => {
-  let { url } = req.body;
-  // Formate l'url
-  url = url.replace(/^https?:\/\//, '');
-
-  // Vérifie que l'Url est correcte
-  dns.lookup(url, (error, addresses, family) => {
-    if (error) {
-      res.json({ error: 'Invalid url' });
-    } else {
-      id++;
-      // On instancie un nouvel objet site
-      const site = new Site({
-        originalUrl: url,
-        shortUrl: id,
-      });
-
-      // Enregistre un site en bdd
-      site
-        .save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré' }))
-        .catch(error => res.status(400).json({ error }));
-    }
-  });
-});
-
-app.get('/api/shorturl/:id', (req, res) => {
-  const { id } = req.query;
-  const shortUrl = links.find(link => link.id === id);
-  // TODO : Récupérer l'entrée en base et rediriger vers l'url originale
-  res.redirect(shortUrl.original_url);
-});
+app.use('/api/shorturl/', sitesRoutes);
 
 module.exports = app;
