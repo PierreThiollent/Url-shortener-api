@@ -1,34 +1,46 @@
+const dns = require('dns');
 const Site = require('../models/Site');
+
+// Génère un url random
+const randomUrl = () => {
+  return Math.random()
+    .toString(36)
+    .substring(5);
+};
 
 exports.shortUrl = (req, res) => {
   let { url } = req.body;
+
   // Formate l'url
   url = url.replace(/^https?:\/\//, '');
 
   // Vérifie que l'Url est correcte
   dns.lookup(url, (error, addresses, family) => {
     if (error) {
-      res.json({ error: 'Invalid url' });
+      res.json({ error: "L'url est invalide, veuillez réessayer." });
     } else {
-      id++;
       // On instancie un nouvel objet site
       const site = new Site({
         originalUrl: url,
-        shortUrl: id,
+        shortUrl: randomUrl(),
       });
 
       // Enregistre un site en bdd
       site
         .save()
-        .then(() => res.status(201).json({ message: 'Objet enregistré' }))
-        .catch(error => res.status(400).json({ error }));
+        .then(site =>
+          res.status(201).json({
+            originalUrl: site.originalUrl,
+            shortUrl: `${req.protocol}://${req.get('Host')}/${site.shortUrl}`,
+          }),
+        )
+        .catch(error => res.status(400).json({ error: "Une erreur s'est produite, veuillez réessayer" }));
     }
   });
 };
 
 exports.getShortUrl = (req, res) => {
-  const { id } = req.params;
-  // TODO : Récupérer l'entrée en base et rediriger vers l'url originale
-  // const shortUrl = links.find(link => link.id === id);
-  // res.redirect(shortUrl.original_url);
+  Site.findOne({ shortUrl: req.params.id })
+    .then(site => res.redirect('https://' + site.originalUrl))
+    .catch(error => res.status(400).json({ error: "Cet url n'est pas valide, elle a peut-être expiré." }));
 };
