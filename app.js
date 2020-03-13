@@ -1,11 +1,9 @@
 const express = require('express');
 const cors = require('cors');
-const dns = require('dns');
 const mongoose = require('mongoose');
 const sitesRoutes = require('./routes/sites');
 
 const app = express();
-let id = 0;
 
 // Connexion à la bdd
 mongoose
@@ -17,16 +15,16 @@ mongoose
 app.use(cors());
 
 // On sert le dossier public de manière statique
-app.use('/public', express.static(process.cwd() + '/public'));
+app.use('/public', express.static(__dirname + '/public'));
 
 // On retourne l'index.html sur la route /
 app.get('/', (req, res) => {
-  res.sendFile(process.cwd() + '/views/index.html');
+  res.sendFile(__dirname + '/views/index.html');
 });
 
 // Converti le body de la requete
 app.use(express.urlencoded({ extended: false }));
 
-app.use('/api/shorturl/', sitesRoutes);
+app.use('/', sitesRoutes);
 
 module.exports = app;
