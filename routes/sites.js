@@ -5,7 +5,7 @@ const sitesController = require('../controllers/sites');
 const router = express.Router();
 
 // Route pour raccourcir une url
-router.post('/new', sitesController.shortUrl);
+router.post('/short', sitesController.shortUrl);
 // Route pour obtenir l'url raccourcie
 router.get('/:id', sitesController.getShortUrl);
 
